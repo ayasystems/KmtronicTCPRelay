@@ -8,9 +8,9 @@ try {
 
 	$lib = new RelayLib(IP, PORT, USER, PASSWORD);
 	$status = $lib->status();
-
+	$name   = $lib->name();
 	$complete = array_combine($name, $status);
-  echo'{"Status":'.json_encode($complete).'}'; 
+        echo'{"Status":'.json_encode($complete).'}'; 
      
 }catch (Exception $exc) {
 

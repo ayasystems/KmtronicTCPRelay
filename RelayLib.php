@@ -1,6 +1,6 @@
 <?php 
 
-class RelayLib {
+class RelayLibV {
 	protected $_curlResource;
 	protected $_url;
 	
@@ -69,9 +69,30 @@ class RelayLib {
 		
 		return $this->getElementName($status);
 	}	
+	
+	public function getData()
+	{
+		$curl = $this->_curlResource;
+		
+		$resultStatus = curl_getinfo($curl);
+		if ($resultStatus['http_code'] != 200)
+			throw new Exception("Status connection failed .Server responded with: ".$resultStatus['http_code']." code");
+		curl_setopt($curl, CURLOPT_URL, $this->_url . 'status.xml');
+		
+		$result = curl_exec($curl);
+		 
+		if ($result != true)
+			throw new Exception("Status check curl_execution failed ");
+		
+		$status = $this->loadUrlAndDom($result);
+		
+		return $this->getAll($status);
+	}	
+	
+	
 	public function toggle($relNumber)
 	{
-		if ($relNumber < 1 && $relNumber > 8)
+		if ($relNumber < 1 || $relNumber > 8)
 			throw new Exception("The toggle function input should from 1 to 8 .You have entered:".$relNumber);
 		
 		$curl = $this->_curlResource;
@@ -81,8 +102,10 @@ class RelayLib {
 		curl_setopt($curl, CURLOPT_URL, $this->_url .'relays.cgi?relay='. $relNumber);
 		
 		$result = curl_exec($curl);
-		if ($result != true)
+		
+		if ($result != true){
 			throw new Exception("Toggle curl_execution failed.");
+		}
 	}
 	protected function loadUrlAndDom($content)
 	{
@@ -131,4 +154,25 @@ class RelayLib {
 		throw new Exception("Unexpected document structure.");
 
 	}	
+	
+	protected function getAll($obj)
+	{
+
+		if (!$obj->getElementsByTagName('response')->length)
+			throw new Exception('Could not get HTML content.');
+		$matches = array (
+			array("Relay1",$obj->getElementsByTagName('r1name')->item(0)->nodeValue,$obj->getElementsByTagName('relay1')->item(0)->nodeValue),
+			array("Relay2",$obj->getElementsByTagName('r2name')->item(0)->nodeValue,$obj->getElementsByTagName('relay2')->item(0)->nodeValue),
+			array("Relay3",$obj->getElementsByTagName('r3name')->item(0)->nodeValue,$obj->getElementsByTagName('relay3')->item(0)->nodeValue),
+			array("Relay4",$obj->getElementsByTagName('r4name')->item(0)->nodeValue,$obj->getElementsByTagName('relay4')->item(0)->nodeValue),
+			array("Relay5",$obj->getElementsByTagName('r5name')->item(0)->nodeValue,$obj->getElementsByTagName('relay5')->item(0)->nodeValue),
+			array("Relay6",$obj->getElementsByTagName('r6name')->item(0)->nodeValue,$obj->getElementsByTagName('relay6')->item(0)->nodeValue),
+			array("Relay7",$obj->getElementsByTagName('r7name')->item(0)->nodeValue,$obj->getElementsByTagName('relay7')->item(0)->nodeValue),
+			array("Relay8",$obj->getElementsByTagName('r8name')->item(0)->nodeValue,$obj->getElementsByTagName('relay8')->item(0)->nodeValue)
+		);
+		
+		return $matches;
+		throw new Exception("Unexpected document structure.");
+
+	}		
 }

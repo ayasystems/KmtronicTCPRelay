@@ -1,8 +1,11 @@
 <?php 
 
  try {
-    include './RelayLibV.php';
-	$lib = new RelayLibV('192.168.1.1', '80', 'user', 'passw0rd');
+include "./config/config.php";
+include './RelayLib.php';
+ 
+	$lib = new RelayLib(IP, PORT, USER, PASSWORD);
+ 
  	
 if (isset($_GET['relay'])) {
     $relay = $_GET['relay'];

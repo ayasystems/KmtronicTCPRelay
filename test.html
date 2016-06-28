@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=0.6,maximum-scale=1, user-scalable=yes">
+	<!--<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">-->
+ 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+    <!-- Das neueste kompilierte und minimierte CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <!-- Optionales Theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
+    <!-- Das neueste kompilierte und minimierte JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css"></style>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+	<script>
+	 var tableRelay = null;
+	</script>
+ 
+  </head>
+  <body>
+ 
+
+  <div class="table-responsive">  
+
+	<table id="example" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Rele</th>
+                <th>Nombre</th>
+                <th>Estado</th>
+				<th>Cambiar estado</th>
+            </tr>
+        </thead>
+
+    </table>
+</div>
+<script>
+ 
+
+	    $(document).ready(function() {
+		 tableRelay = $('#example').DataTable( {
+						"ajax": "./relay.php",
+							
+						"bFilter": false,
+						"bSearchable":false,
+						"bPaginate":false,
+						"bInfo":false,
+						"columnDefs": [ {
+							"targets": -1,
+							"sPaginationType": "full_numbers",
+
+							"data": null,
+							"defaultContent": "<button>Change</button>"
+						} ]
+					} );
+		$('#example tbody').on( 'click', 'button', function () {
+			var data = tableRelay.row( $(this).parents('tr') ).data();
+			var relayNum = tableRelay.row( $(this).parents('tr') ).index() +1;
+
+			$.getJSON("./relay.php?relay=" + relayNum, function(response) {
+					if (response.error) {
+						// an error occurred
+						alert ('Error executing command');
+					}
+					else {
+						$.each(response.results, function(i, result) {
+							// do something with each result
+						});
+					}
+				});
+			
+		} );					
+				} );
+	 
+	setInterval( function () {
+		 tableRelay.ajax.reload( null, false ); // user paging is not reset on reload
+	}, 5000 );
+ 
+
+</script>
+</html>
